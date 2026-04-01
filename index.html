@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendario de Actividades — CIREN</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --border: #E2DDD6;
+    --border-strong: #C8C2B8;
+    --text: #1A1916;
+    --text-muted: #6B6760;
+    --text-faint: #A8A49E;
+    --accent: #1A5C3A;
+    --accent-light: #E8F2EC;
+    --accent-mid: #2D7A52;
+    --sem: #1A3A5C;
+    --sem-light: #E8EFF5;
+    --reu: #5C3A1A;
+    --reu-light: #F5EEE8;
+    --tal: #1A5C3A;
+    --tal-light: #E8F2EC;
+    --danger: #8B2020;
+    --danger-light: #F5E8E8;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .header-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .header-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .header-org {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-family: 'DM Mono', monospace;
+  }
+
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .month-group { margin-bottom: 2.5rem; }
+
+  .month-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 10px;
+    transition: border-color 0.15s;
+  }
+
+  .card:hover { border-color: var(--border-strong); }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.45;
+    flex: 1;
+    color: var(--text);
+  }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .badge-seminario { background: var(--sem-light); color: var(--sem); }
+  .badge-taller { background: var(--tal-light); color: var(--tal); }
+  .badge-reunion { background: var(--reu-light); color: var(--reu); }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin-bottom: 8px;
+  }
+
+  .meta {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .meta strong { color: var(--text); font-weight: 400; }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--text-faint);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 12px 0;
+  }
+
+  .inscriptos-label {
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-bottom: 8px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .inscriptos-label .count {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 1px 6px;
+    margin-left: 4px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 20px;
+    margin-bottom: 12px;
+  }
+
+  .tag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px 3px 12px;
+    color: var(--text);
+    animation: fadeIn 0.15s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+  .tag-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-faint);
+    font-size: 15px;
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.1s;
+  }
+
+  .tag-del:hover { color: var(--danger); }
+
+  .empty {
+    font-size: 12px;
+    color: var(--text-faint);
+    font-style: italic;
+  }
+
+  .register-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .register-row input {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.15s, background 0.15s;
+    outline: none;
+  }
+
+  .register-row input:focus {
+    border-color: var(--accent-mid);
+    background: var(--surface);
+  }
+
+  .register-row input::placeholder { color: var(--text-faint); }
+
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    transition: background 0.12s, border-color 0.12s;
+    white-space: nowrap;
+  }
+
+  .btn:hover { background: var(--bg); border-color: var(--accent-mid); }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    z-index: 100;
+    transition: opacity 0.3s;
+  }
+
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: white;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: all 0.2s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 200;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.error { background: var(--danger); }
+
+  @media (max-width: 500px) {
+    header { padding: 1rem; }
+    main { padding: 1.5rem 1rem 3rem; }
+    .card { padding: 1rem; }
+    .register-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <p class="loading-text">Cargando actividades...</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<header>
+  <div class="header-inner">
+    <span class="header-title">Calendario de difusión 2026</span>
+    <span class="header-sub">Anótate en las actividades que planeas asistir</span>
+    <span class="header-org">CIREN</span>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<script>
+const SUPABASE_URL = "https://mycecjprcavtbrjtagpa.supabase.co";
+const SUPABASE_KEY = "sb_publishable_ns5aiqR4bussXdJyDRk8lQ_1wNFKd2k";
+
+const activities = [
+  { id: 1, title: "Seminario de difusión — Avances Bienes Públicos Gestión Hídrica R. Valparaíso", fecha: "23 de abril de 2026", horario: "9:30 a 12:45", lugar: "Open Hotel, Rafael Ariztía #527, Quillota", desc: "Seminario de convocatoria abierta; asistencia esperada 70 personas o más.", tipo: "seminario" },
+  { id: 2, title: "Reunión de Gobernanza Estratégica — Bienes Públicos Gestión Hídrica R. Valparaíso", fecha: "23 de abril de 2026", horario: "13:00 a 16:00", lugar: "Open Hotel, Rafael Ariztía #527, Quillota", desc: "Reunión de gobernanza en conjunto con los otros BBPP de gestión hídrica.", tipo: "reunion" },
+  { id: 3, title: "Seminario de difusión en colaboración con INDAP - PERFRUTS", fecha: "Junio 2026", horario: "Por confirmar", lugar: "Salón INDAP, Ramón Freire #765, Quillota", desc: "Seminario de convocatoria abierta; asistencia esperada 70 personas o más.", tipo: "seminario" },
+  { id: 4, title: "Seminario de difusión en colaboración con DUOC UTFSM — PERFRUTS", fecha: "30 de septiembre de 2026", horario: "Por confirmar", lugar: "DUOC UC Quillota, Camino Internacional, Paradero 11, sector San Pedro", desc: "Seminario de convocatoria abierta; asistencia esperada 70 personas o más.", tipo: "seminario" },
+  { id: 5, title: "Taller 1 — Calle Larga", fecha: "9 de junio de 2026", horario: "11:00 a 13:00", lugar: "Centro Cultural Pedro Aguirre Cerda #101, Calle Larga", desc: "Taller teórico-práctico de uso de la plataforma; asistencia esperada máximo 30 personas.", tipo: "taller" },
+  { id: 6, title: "Taller 2 — La Ligua", fecha: "10 de junio de 2026", horario: "11:00 a 13:00", lugar: "Por confirmar", desc: "Taller teórico-práctico de uso de la plataforma; asistencia esperada máximo 30 personas.", tipo: "taller" },
+  { id: 7, title: "Taller 3 — La Cruz o Quillota", fecha: "Octubre 2026", horario: "11:00 a 13:00", lugar: "Por confirmar", desc: "Taller teórico-práctico de uso de la plataforma; asistencia esperada máximo 30 personas.", tipo: "taller" },
+  { id: 8, title: "Taller 4 — Casablanca", fecha: "Octubre 2026", horario: "11:00 a 13:00", lugar: "Por confirmar", desc: "Taller teórico-práctico de uso de la plataforma; asistencia esperada máximo 30 personas.", tipo: "taller" },
+  { id: 9, title: "Seminario de cierre", fecha: "Noviembre 2026", horario: "Por confirmar", lugar: "Por confirmar", desc: "Seminario de convocatoria abierta; asistencia esperada 70 personas o más.", tipo: "seminario" }
+];
+
+const groups = [
+  { label: "Abril", ids: [1, 2] },
+  { label: "Junio", ids: [3, 5, 6] },
+  { label: "Septiembre", ids: [4] },
+  { label: "Octubre", ids: [7, 8] },
+  { label: "Noviembre", ids: [9] }
+];
+
+let inscripciones = {};
+activities.forEach(a => inscripciones[a.id] = []);
+
+async function apiGet(path) {
+  const r = await fetch(SUPABASE_URL + path, {
+    headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
+  });
+  return r.json();
+}
+
+async function apiPost(path, body) {
+  const r = await fetch(SUPABASE_URL + path, {
+    method: "POST",
+    headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", "Prefer": "return=representation" },
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+
+async function apiDelete(path) {
+  await fetch(SUPABASE_URL + path, {
+    method: "DELETE",
+    headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
+  });
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (isError ? " error" : "");
+  setTimeout(() => t.className = "toast", 2500);
+}
+
+async function loadAll() {
+  const data = await apiGet("/rest/v1/inscripciones?select=*&order=created_at.asc");
+  activities.forEach(a => inscripciones[a.id] = []);
+  if (Array.isArray(data)) {
+    data.forEach(row => {
+      if (inscripciones[row.actividad_id] !== undefined) {
+        inscripciones[row.actividad_id].push({ id: row.id, nombre: row.nombre });
+      }
+    });
+  }
+}
+
+async function addName(actId) {
+  const input = document.getElementById("input-" + actId);
+  const btn = document.getElementById("btn-" + actId);
+  const nombre = input.value.trim();
+  if (!nombre) return;
+
+  const exists = inscripciones[actId].some(x => x.nombre.toLowerCase() === nombre.toLowerCase());
+  if (exists) { showToast("Ese nombre ya está anotado en esta actividad.", true); return; }
+
+  btn.disabled = true;
+  input.disabled = true;
+
+  const result = await apiPost("/rest/v1/inscripciones", { actividad_id: actId, nombre });
+
+  if (Array.isArray(result) && result[0]) {
+    inscripciones[actId].push({ id: result[0].id, nombre: result[0].nombre });
+    input.value = "";
+    renderTags(actId);
+    showToast("¡Inscripción registrada!");
+  } else {
+    showToast("Error al guardar. Intenta de nuevo.", true);
+  }
+
+  btn.disabled = false;
+  input.disabled = false;
+  input.focus();
+}
+
+async function removeName(actId, rowId, nombre) {
+  if (!confirm("¿Eliminar la inscripción de " + nombre + "?")) return;
+  await apiDelete("/rest/v1/inscripciones?id=eq." + rowId);
+  inscripciones[actId] = inscripciones[actId].filter(x => x.id !== rowId);
+  renderTags(actId);
+  showToast("Inscripción eliminada.");
+}
+
+function renderTags(actId) {
+  const el = document.getElementById("tags-" + actId);
+  const countEl = document.getElementById("count-" + actId);
+  const list = inscripciones[actId];
+  countEl.textContent = list.length;
+  if (!list.length) {
+    el.innerHTML = '<span class="empty">Nadie anotado aún</span>';
+    return;
+  }
+  el.innerHTML = list.map(x =>
+    `<span class="tag">${x.nombre}<button class="tag-del" title="Eliminar" onclick="removeName(${actId},'${x.id}','${x.nombre.replace(/'/g, "\\'")}')">×</button></span>`
+  ).join("");
+}
+
+function renderAll() {
+  const main = document.getElementById("main");
+  let html = "";
+  groups.forEach(g => {
+    html += `<div class="month-group"><div class="month-label">${g.label}</div>`;
+    g.ids.forEach(id => {
+      const a = activities.find(x => x.id === id);
+      html += `
+        <div class="card">
+          <div class="card-top">
+            <div class="card-title">${a.title}</div>
+            <span class="badge badge-${a.tipo}">${a.tipo}</span>
+          </div>
+          <div class="card-meta">
+            <span class="meta">Fecha: <strong>${a.fecha}</strong></span>
+            <span class="meta">Horario: <strong>${a.horario}</strong></span>
+            <span class="meta">Lugar: <strong>${a.lugar}</strong></span>
+          </div>
+          <div class="card-desc">${a.desc}</div>
+          <div class="divider"></div>
+          <div class="inscriptos-label">Asistirán <span class="count" id="count-${id}">0</span></div>
+          <div class="tags" id="tags-${id}"><span class="empty">Nadie anotado aún</span></div>
+          <div class="register-row">
+            <input type="text" id="input-${id}" placeholder="Tu nombre completo" onkeydown="if(event.key==='Enter') addName(${id})" />
+            <button class="btn" id="btn-${id}" onclick="addName(${id})">Anotarme</button>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  main.innerHTML = html;
+}
+
+async function init() {
+  renderAll();
+  await loadAll();
+  activities.forEach(a => renderTags(a.id));
+  const overlay = document.getElementById("loading");
+  overlay.classList.add("hidden");
+  setTimeout(() => overlay.remove(), 400);
+
+  setInterval(async () => {
+    await loadAll();
+    activities.forEach(a => renderTags(a.id));
+  }, 30000);
+}
+
+init();
+</script>
+</body>
+</html>
